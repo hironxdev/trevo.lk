@@ -139,20 +139,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     })}
   </div>
 
-  {/* Partner Panel Button */}
-  <div className="pt-1">
-    <Link
-      href="/partner/dashboard"
-      className={cn(
-        "flex items-center justify-center w-full px-3 py-2.5 rounded-lg text-sm font-semibold transition",
-        pathname === "/partner/dashboard"
-          ? "bg-primary text-primary-foreground"
-          : "bg-primary text-primary-foreground hover:opacity-90",
-      )}
-    >
-      View Partner Panel
-    </Link>
-  </div>
+  {/* Partner Panel Button - Only show for partners */}
 
   {/* Support */}
   <div className="pt-2 space-y-1">

@@ -24,14 +24,13 @@ const navItems = [
   { href: "/admin/vehicles", label: "Vehicles", icon: Car },
   { href: "/admin/stays", label: "Stays", icon: Home },
   { href: "/admin/events", label: "Events", icon: Ticket },
-  { href: "/admin/categories", label: "Vehicle Categories", icon: FolderOpen },
-  { href: "/admin/stays-categories", label: "Stays Categories", icon: Building },
   { href: "/admin/partners", label: "Partners", icon: Shield },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/bookings", label: "Vehicle Bookings", icon: CalendarClock },
   { href: "/admin/stays-bookings", label: "Stays Bookings", icon: CalendarCheck },
+  { href: "/admin/stays-categories", label: "Stays Categories", icon: Building },
+  { href: "/admin/categories", label: "Vehicle Categories", icon: FolderOpen },
   { href: "/admin/analytics", label: "Analytics", icon: TrendingUp },
-  { href: "/admin/messages", label: "Messages", icon: MessageSquare },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 
