@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"path": "../../../trevo-main(1)/trevo.lk"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../.vscode"
+		},
+		{
+			"path": "../actions"
+		},
+		{
+			"path": "../lib"
+		},
+		{
+			"path": "../prisma"
+		},
+		{
+			"path": "../public"
+		},
+		{
+			"path": "../scripts"
+		},
+		{
+			"path": "../types"
+		},
+		{
+			"path": "../app"
+		},
+		{
+			"path": "../components"
+		}
+	],
+	"settings": {}
+}

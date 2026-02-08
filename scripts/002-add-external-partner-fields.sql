@@ -1,0 +1,42 @@
+-- Migration: Add external partner fields and make vehicle fields optional
+-- Note: This is a MongoDB database, so this SQL is for documentation purposes only.
+-- MongoDB schema changes are handled automatically by Prisma.
+
+-- New fields added to Vehicle model:
+-- - partnerId: Now optional (String? instead of String)
+-- - categoryId: Now optional
+-- - make: Now optional
+-- - model: Now optional
+-- - year: Now optional
+-- - licensePlate: Now optional (but still unique if provided)
+-- - pricePerDay: Now optional
+-- - depositRequired: Now optional
+-- - location: Now optional
+
+-- New external partner fields:
+-- - externalPartnerName: String? - Partner name when no partnerId
+-- - externalPartnerPhone: String? - Partner phone for contact
+-- - externalPartnerEmail: String? - Partner email for contact
+-- - externalPartnerWhatsApp: String? - Partner WhatsApp number
+-- - externalPartnerAddress: String? - Partner address/location
+-- - externalPartnerType: String? - "individual" or "business"
+-- - displayName: String? - Custom display name for the vehicle
+
+-- To apply these changes:
+-- 1. Run `npx prisma generate` to regenerate the Prisma client
+-- 2. Run `npx prisma db push` to push schema changes to MongoDB
+
+-- Example vehicle with external partner:
+-- {
+--   "externalPartnerName": "John's Rentals",
+--   "externalPartnerPhone": "+94 77 123 4567",
+--   "externalPartnerWhatsApp": "+94 77 123 4567",
+--   "externalPartnerEmail": "john@rentals.com",
+--   "externalPartnerAddress": "123 Main Street, Colombo",
+--   "externalPartnerType": "business",
+--   "displayName": "Luxury SUV for Weddings",
+--   "make": "Toyota",
+--   "model": "Land Cruiser",
+--   "contactOnly": true,
+--   "isAdminCreated": true
+-- }
