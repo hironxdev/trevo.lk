@@ -109,6 +109,45 @@ enum StaysBookingStatus {
   REJECTED
 }
 
+enum EventStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum TicketBookingStatus {
+  PENDING_PAYMENT
+  PENDING_APPROVAL
+  PAID
+  CONFIRMED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  CASH_DEPOSIT
+}
+
+enum PromoCodeType {
+  PERCENT
+  FIXED
+}
+
+enum NotificationChannel {
+  EMAIL
+  WHATSAPP
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
@@ -122,15 +161,18 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  bookings      Booking[]
-  reviews       Review[]
-  notifications Notification[]
-  partner       Partner?
-  adminLogs     AdminLog[]
-  staysBookings StaysBooking[]
-  staysReviews  StaysReview[]
+  accounts          Account[]
+  sessions          Session[]
+  bookings          Booking[]
+  reviews           Review[]
+  notifications     Notification[]
+  partner           Partner?
+  adminLogs         AdminLog[]
+  staysBookings     StaysBooking[]
+  staysReviews      StaysReview[]
+  eventBookings     Booking_Event[]
+  checkedInTickets  Ticket[]
+  adminEventReviews AdminEventReview[]
 }
 
 model Account {
@@ -209,11 +251,12 @@ model Partner {
   businessEmail               String?
   totalVehicles               Int?
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  vehicles Vehicle[]
-  bookings Booking[]
-  stays         Stays[]
-  staysBookings StaysBooking[]
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicles        Vehicle[]
+  bookings        Booking[]
+  stays           Stays[]
+  staysBookings   StaysBooking[]
+  events          Event[]
 }
 
 model Category {
@@ -526,4 +569,147 @@ model StaysReview {
   booking StaysBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   stays   Stays        @relation(fields: [staysId], references: [id])
   user    User         @relation(fields: [userId], references: [id])
+}
+
+// Events & Tickets Models
+model Event {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  organizerId    String      @db.ObjectId
+  slug           String      @unique
+  titleEn        String
+  titleSi        String?
+  descEn         String?
+  descSi         String?
+  category       String?     // e.g., MUSIC, SPORTS, CONFERENCE
+  city           String
+  venueName      String
+  mapUrl         String?
+  posterUrl      String?
+  startAt        DateTime
+  endAt          DateTime?
+  status         EventStatus @default(DRAFT)
+  adminNote      String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organizer          Partner              @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  ticketTypes        TicketType[]
+  bookings           Booking_Event[]
+  promoCodes         PromoCode[]
+  groupDiscountRules GroupDiscountRule[]
+  adminReviews       AdminEventReview[]
+}
+
+model TicketType {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  eventId       String   @db.ObjectId
+  name          String   // VIP, Normal, EarlyBird
+  price         Float    // in LKR cents or decimal
+  currency      String   @default("LKR")
+  totalQty      Int
+  soldQty       Int      @default(0)
+  salesStartAt  DateTime?
+  salesEndAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  event    Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bookings Booking_Event[]
+}
+
+model PromoCode {
+  id         String           @id @default(auto()) @map("_id") @db.ObjectId
+  eventId    String           @db.ObjectId
+  code       String
+  type       PromoCodeType
+  value      Float            // percentage or fixed amount
+  active     Boolean          @default(true)
+  usageLimit Int?
+  usedCount  Int              @default(0)
+  startsAt   DateTime?
+  endsAt     DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  event    Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bookings Booking_Event[]
+
+  @@unique([eventId, code])
+}
+
+model GroupDiscountRule {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  eventId   String           @db.ObjectId
+  minQty    Int
+  type      PromoCodeType
+  value     Float
+  active    Boolean          @default(true)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Booking_Event {
+  id                     String                @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String                @db.ObjectId
+  eventId                String                @db.ObjectId
+  ticketTypeId           String                @db.ObjectId
+  qty                    Int
+  unitPrice              Float                 // Price per ticket at time of booking
+  promoCodeId            String?               @db.ObjectId
+  discountAmount         Float                 @default(0)
+  totalAmount            Float
+  platformFeeAmount      Float                 @default(0)
+  organizerPayoutAmount  Float                 @default(0)
+  status                 TicketBookingStatus   @default(PENDING_PAYMENT)
+  paymentMethod          PaymentMethod?
+  slipUrl                String?               // For bank/cash deposit
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event         Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketType    TicketType         @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+  promoCode     PromoCode?         @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+  tickets       Ticket[]
+  notifications NotificationLog[]
+}
+
+model Ticket {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  bookingId      String   @db.ObjectId
+  ticketCode     String   @unique
+  qrPayload      String   // JSON encoded ticket data (signed or random token)
+  checkedInAt    DateTime?
+  checkedInById  String?  @db.ObjectId
+  createdAt      DateTime @default(now())
+
+  booking      Booking_Event @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  checkedInBy  User?         @relation(fields: [checkedInById], references: [id], onDelete: SetNull)
+}
+
+model NotificationLog {
+  id        String               @id @default(auto()) @map("_id") @db.ObjectId
+  bookingId String               @db.ObjectId
+  channel   NotificationChannel
+  to        String               // Email or WhatsApp number
+  payloadJson String             // JSON serialized message
+  status    NotificationStatus   @default(QUEUED)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  booking Booking_Event @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model AdminEventReview {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  eventId   String      @db.ObjectId
+  adminId   String      @db.ObjectId
+  decision  EventStatus // APPROVED or REJECTED
+  note      String?
+  createdAt DateTime    @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  admin User  @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
