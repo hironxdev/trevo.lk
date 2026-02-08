@@ -60,17 +60,19 @@ export async function approveVehicle(vehicleId: string, approved: boolean, rejec
     })
 
     // Create notification for partner
-    await prisma.notification.create({
-      data: {
-        userId: vehicle.partner.userId,
-        type: approved ? "VEHICLE_APPROVED" : "VEHICLE_REJECTED",
-        title: approved ? "Vehicle Approved" : "Vehicle Rejected",
-        message: approved
-          ? `Your vehicle ${vehicle.make} ${vehicle.model} has been approved and is now live on the platform.`
-          : `Your vehicle ${vehicle.make} ${vehicle.model} was not approved. ${rejectionReason || "Please review and resubmit."}`,
-        link: `/partner/vehicles`,
-      },
-    })
+    if (vehicle.partner) {
+      await prisma.notification.create({
+        data: {
+          userId: vehicle.partner.userId,
+          type: approved ? "VEHICLE_APPROVED" : "VEHICLE_REJECTED",
+          title: approved ? "Vehicle Approved" : "Vehicle Rejected",
+          message: approved
+            ? `Your vehicle ${vehicle.make} ${vehicle.model} has been approved and is now live on the platform.`
+            : `Your vehicle ${vehicle.make} ${vehicle.model} was not approved. ${rejectionReason || "Please review and resubmit."}`,
+          link: `/partner/vehicles`,
+        },
+      })
+    }
 
     // Log action
     await prisma.adminLog.create({
