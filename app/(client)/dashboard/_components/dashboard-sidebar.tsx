@@ -46,6 +46,11 @@ const menuItems = [
     icon: Home,
   },
   {
+    title: "Browse Events",
+    href: "/events",
+    icon: Calendar,
+  },
+  {
     title: "Favorites",
     href: "/dashboard/favorites",
     icon: Heart,

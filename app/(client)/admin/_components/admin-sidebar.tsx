@@ -16,12 +16,14 @@ import {
   Home,
   Building,
   CalendarCheck,
+  Ticket,
 } from "lucide-react"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/vehicles", label: "Vehicles", icon: Car },
   { href: "/admin/stays", label: "Stays", icon: Home },
+  { href: "/admin/events", label: "Events", icon: Ticket },
   { href: "/admin/categories", label: "Vehicle Categories", icon: FolderOpen },
   { href: "/admin/stays-categories", label: "Stays Categories", icon: Building },
   { href: "/admin/partners", label: "Partners", icon: Shield },

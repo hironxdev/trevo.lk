@@ -16,6 +16,7 @@ import { ImageUpload } from "@/components/upload/image-upload"
 import { LocationSelector } from "@/components/location-selector"
 import { User, Building2 } from "lucide-react"
 import { UseFormReturn } from "react-hook-form"
+import { normalizeCategories } from "@/lib/utils/normalize-categories"
 
 interface VehicleStepProps {
   form: UseFormReturn<any>
@@ -102,11 +103,17 @@ export function VehicleStep({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
+                      {Array.isArray(categories) && categories.length > 0 ? (
+                        normalizeCategories(categories).map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-categories" disabled>
+                          No categories available
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

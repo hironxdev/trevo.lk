@@ -17,6 +17,7 @@ import {
   Bell,
   Home,
   CalendarCheck,
+  Ticket,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -41,8 +42,10 @@ export function PartnerSidebar({
   const [collapsed, setCollapsed] = useState(false)
   const isVerified = kycStatus === "VERIFIED"
 
-  const showVehicles = serviceType === "VEHICLE_RENTAL" || serviceType === "BOTH"
-  const showStays = serviceType === "STAYS" || serviceType === "BOTH"
+  // Show all services by default - partner can use any service once verified
+  const showVehicles = true
+  const showStays = true
+  const showEvents = true
 
   const navItems = [
     {
@@ -95,6 +98,21 @@ export function PartnerSidebar({
       badge: null,
       disabled: !isVerified,
       show: showStays,
+    },
+    {
+      title: "My Events",
+      href: "/partner/events",
+      icon: Ticket,
+      badge: null,
+      show: showEvents,
+    },
+    {
+      title: "Add Event",
+      href: "/partner/events/new",
+      icon: Plus,
+      badge: null,
+      disabled: !isVerified,
+      show: showEvents,
     },
     {
       title: "Earnings",
@@ -160,7 +178,7 @@ export function PartnerSidebar({
                       kycStatus === "REJECTED" && "bg-red-500/10 text-red-600 border-red-500/20",
                     )}
                   >
-                    {kycStatus}
+                    {kycStatus === "VERIFIED" ? "Approved" : kycStatus}
                   </Badge>
                 </div>
               </div>
@@ -212,7 +230,7 @@ export function PartnerSidebar({
                   <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
                   <TooltipContent side="right">
                     <p>{item.title}</p>
-                    {isDisabled && <p className="text-xs text-muted-foreground">Requires verification</p>}
+                    {isDisabled && <p className="text-xs text-muted-foreground">Requires admin approval</p>}
                   </TooltipContent>
                 </Tooltip>
               )

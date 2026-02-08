@@ -8,6 +8,7 @@ import { z } from "zod"
 import { createStays } from "@/actions/stays/create"
 import { updateStays } from "@/actions/stays/update"
 import { getStaysCategories } from "@/actions/stays-category/list"
+import { normalizeCategories } from "@/lib/utils/normalize-categories"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -135,9 +136,16 @@ export function StaysForm({ stays }: StaysFormProps) {
 
   useEffect(() => {
     async function fetchCategories() {
-      const result = await getStaysCategories()
-      if (result.success && result.data) {
-        setCategories(result.data)
+      try {
+        const result = await getStaysCategories()
+        if (result.success && result.data) {
+          setCategories(normalizeCategories(result.data))
+        } else {
+          setCategories([])
+        }
+      } catch (error) {
+        console.error("[v0] Error fetching stays categories:", error)
+        setCategories([])
       }
     }
     fetchCategories()
@@ -246,11 +254,17 @@ export function StaysForm({ stays }: StaysFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
+                        {Array.isArray(categories) && categories.length > 0 ? (
+                          categories.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-categories" disabled>
+                            No categories available
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />

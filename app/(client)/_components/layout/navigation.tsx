@@ -12,6 +12,7 @@ import {
   Phone,
   LogIn,
   ChevronDown,
+  Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,6 +24,7 @@ import { cn } from "@/lib/utils";
 const navigationLinks = [
   { name: "Browse Vehicles", href: "/vehicles", icon: Car },
   { name: "Browse Stays", href: "/stays", icon: Home },
+  { name: "Browse Events", href: "/events", icon: Calendar },
   { name: "How It Works", href: "/how-it-works", icon: Info },
   { name: "Become Partner", href: "/partner/register", icon: Users },
   { name: "Contact", href: "/contact", icon: Phone },

@@ -8,6 +8,7 @@ import { z } from "zod"
 import { createVehicle } from "@/actions/vehicle/create"
 import { updateVehicle } from "@/actions/vehicle/update"
 import { getCategories } from "@/actions/category/list"
+import { normalizeCategories } from "@/lib/utils/normalize-categories"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -115,9 +116,16 @@ export function VehicleForm({ vehicle }: VehicleFormProps) {
 
   useEffect(() => {
     async function fetchCategories() {
-      const result = await getCategories()
-      if (result.success && result.data) {
-        setCategories(result.data)
+      try {
+        const result = await getCategories()
+        if (result.success && result.data) {
+          setCategories(normalizeCategories(result.data))
+        } else {
+          setCategories([])
+        }
+      } catch (error) {
+        console.error("[v0] Error fetching categories:", error)
+        setCategories([])
       }
     }
     fetchCategories()
@@ -183,11 +191,17 @@ export function VehicleForm({ vehicle }: VehicleFormProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
+                      {Array.isArray(categories) && categories.length > 0 ? (
+                        categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-categories" disabled>
+                          No categories available
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -554,7 +568,7 @@ export function VehicleForm({ vehicle }: VehicleFormProps) {
                   <CardTitle className="text-base">Driver Pricing</CardTitle>
                   <CardDescription>
                     Set additional charges when renting with a driver
-                    <span className="block text-xs">රියදුරු සමඟ කුලියට ගැනීමේදී අමතර ගාස්තු සකසන්න</span>
+                    <span className="block text-xs">රියදුරු සමඟ කුලියට ගැනීමේදී අමතර ���ාස්තු සකසන්න</span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">

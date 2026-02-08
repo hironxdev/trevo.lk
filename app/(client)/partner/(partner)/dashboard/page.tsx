@@ -129,22 +129,16 @@ export default async function PartnerDashboardPage() {
   const partnerName = partner.partnerType === "BUSINESS" ? partner.businessName : partner.fullName || session.user.name
 
   return (
-    <div>
+    <div className="space-y-8">
       <PartnerHeader />
 
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Welcome back{partnerName ? `, ${partnerName}` : ""}!</h1>
-            <p className="text-muted-foreground mt-1">Here's what's happening with your rentals today.</p>
-          </div>
-          <Button asChild>
-            <Link href="/partner/vehicles/new" className="gap-2">
-              Add New Vehicle
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
+      {/* Modern Welcome Section */}
+      <div>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-4xl font-bold">Welcome back, {partnerName || "Partner"}!</h1>
+          <p className="text-lg text-muted-foreground">
+            Track your bookings, earnings, and performance metrics all in one place
+          </p>
         </div>
       </div>
 

@@ -22,6 +22,10 @@ import {
   AlertTriangle,
   Plus,
   Eye,
+  Home,
+  BarChart3,
+  Zap,
+  MapPin,
 } from "lucide-react"
 import { StatCard } from "@/components/partner/stat-card"
 import { ErrorState } from "@/components/partner/error-state"
@@ -122,6 +126,7 @@ export function PartnerDashboardContent() {
   }
 
   const pendingBookings = bookings.filter((b) => b.status === "PENDING")
+  const hasNoListings = vehicles.length === 0 && !loading
 
   return (
     <div className="space-y-6">
@@ -148,11 +153,11 @@ export function PartnerDashboardContent() {
         </Card>
       )}
 
-      {/* Stats Grid */}
+      {/* Premium Stats Grid */}
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i}>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i} className="relative overflow-hidden">
               <CardContent className="p-6">
                 <Skeleton className="h-4 w-20 mb-2" />
                 <Skeleton className="h-8 w-16" />
@@ -161,51 +166,161 @@ export function PartnerDashboardContent() {
           ))}
         </div>
       ) : stats ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <StatCard
-            title="Total Vehicles"
-            value={stats.totalVehicles}
-            icon={Car}
-            href="/partner/vehicles"
-            iconColor="text-primary"
-          />
-          <StatCard
-            title="Active Vehicles"
-            value={stats.activeVehicles}
-            icon={CheckCircle}
-            href="/partner/vehicles"
-            iconColor="text-green-500"
-          />
-          <StatCard
-            title="Pending Approval"
-            value={stats.pendingVehicles}
-            icon={Clock}
-            href="/partner/vehicles"
-            iconColor="text-yellow-500"
-          />
-          <StatCard
-            title="Active Bookings"
-            value={stats.activeBookings}
-            icon={Calendar}
-            href="/partner/bookings"
-            iconColor="text-blue-500"
-          />
-          <StatCard
-            title="This Month"
-            value={`Rs ${stats.monthlyEarnings?.toLocaleString()}`}
-            icon={TrendingUp}
-            href="/partner/earnings"
-            iconColor="text-green-600"
-          />
-          <StatCard
-            title="Total Earnings"
-            value={`Rs ${stats.totalEarnings?.toLocaleString()}`}
-            icon={DollarSign}
-            href="/partner/earnings"
-            iconColor="text-primary"
-          />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {/* Monthly Earnings - Primary Card */}
+          <Link href="/partner/earnings">
+            <Card className="relative overflow-hidden hover:border-primary/50 transition-colors h-full cursor-pointer group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardContent className="p-6 relative">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">This Month</p>
+                    <p className="text-2xl font-bold">Rs {stats.monthlyEarnings?.toLocaleString()}</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {stats.activeBookings} active booking{stats.activeBookings !== 1 ? "s" : ""}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Total Earnings */}
+          <Link href="/partner/earnings">
+            <Card className="relative overflow-hidden hover:border-primary/50 transition-colors h-full cursor-pointer group">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardContent className="p-6 relative">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Total Earnings</p>
+                    <p className="text-2xl font-bold">Rs {stats.totalEarnings?.toLocaleString()}</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <DollarSign className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">All-time revenue</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Active Bookings */}
+          <Link href="/partner/bookings">
+            <Card className="relative overflow-hidden hover:border-primary/50 transition-colors h-full cursor-pointer group">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardContent className="p-6 relative">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Active Bookings</p>
+                    <p className="text-2xl font-bold">{stats.activeBookings}</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">In progress</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Active Listings */}
+          <Link href="/partner/vehicles">
+            <Card className="relative overflow-hidden hover:border-primary/50 transition-colors h-full cursor-pointer group">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardContent className="p-6 relative">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Active Listings</p>
+                    <p className="text-2xl font-bold">{stats.activeVehicles}</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-lg bg-cyan-500/10 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="h-6 w-6 text-cyan-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">Of {stats.totalVehicles} total</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Pending Approval */}
+          <Link href="/partner/vehicles">
+            <Card className="relative overflow-hidden hover:border-primary/50 transition-colors h-full cursor-pointer group">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardContent className="p-6 relative">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Pending Approval</p>
+                    <p className="text-2xl font-bold">{stats.pendingVehicles}</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
+                    <Clock className="h-6 w-6 text-yellow-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">Awaiting review</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       ) : null}
+
+      {/* Getting Started Section */}
+      {hasNoListings && (
+        <Card className="border-primary/50 bg-gradient-to-br from-primary/5 to-primary/2 relative overflow-hidden">
+          <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
+          <CardContent className="p-8 relative">
+            <div className="flex items-start gap-6">
+              <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Zap className="h-8 w-8 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold mb-2">Getting Started</h3>
+                <p className="text-muted-foreground mb-6">
+                  Start earning by listing your vehicles and properties. Follow these simple steps to get your first booking.
+                </p>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center gap-4 p-4 rounded-lg bg-background/50 border border-primary/10 hover:border-primary/30 transition-colors">
+                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary flex-shrink-0">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">Add Your First Listing</p>
+                      <p className="text-sm text-muted-foreground">Create a vehicle or property listing with photos and pricing</p>
+                    </div>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href="/partner/vehicles/new">Add Vehicle</Link>
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-4 p-4 rounded-lg bg-background/50 border border-primary/10 hover:border-primary/30 transition-colors">
+                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary flex-shrink-0">
+                      2
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">Upload Documents</p>
+                      <p className="text-sm text-muted-foreground">Complete identity verification for full account approval</p>
+                    </div>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href="/partner/settings">Verify Now</Link>
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-4 p-4 rounded-lg bg-background/50 border border-primary/10 hover:border-primary/30 transition-colors">
+                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary flex-shrink-0">
+                      3
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">Get Your First Booking</p>
+                      <p className="text-sm text-muted-foreground">Start receiving bookings and earning income from your listings</p>
+                    </div>
+                    <Button size="sm" disabled>Learn More</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid lg:grid-cols-3 gap-6">
@@ -222,9 +337,12 @@ export function PartnerDashboardContent() {
               actionHref="/partner/vehicles"
             />
           ) : (
-            <Card>
+            <Card className="relative overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <CardTitle className="text-lg">Recent Bookings</CardTitle>
+                <div>
+                  <CardTitle className="text-lg">Recent Bookings</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">{bookings.length} recent transactions</p>
+                </div>
                 <Button asChild variant="ghost" size="sm" className="gap-1">
                   <Link href="/partner/bookings">
                     View All
@@ -232,12 +350,12 @@ export function PartnerDashboardContent() {
                   </Link>
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2">
                 {bookings.map((booking) => (
                   <Link
                     key={booking.id}
                     href={`/partner/bookings/${booking.id}`}
-                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+                    className="flex items-center gap-4 p-3 rounded-lg border border-transparent hover:border-primary/30 hover:bg-muted/50 transition-all"
                   >
                     <div className="relative h-12 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
                       {booking.vehicle.images[0] ? (
@@ -295,9 +413,12 @@ export function PartnerDashboardContent() {
               actionHref="/partner/vehicles/new"
             />
           ) : (
-            <Card>
+            <Card className="relative overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <CardTitle className="text-lg">My Vehicles</CardTitle>
+                <div>
+                  <CardTitle className="text-lg">My Listings</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">{vehicles.length} active listing{vehicles.length !== 1 ? "s" : ""}</p>
+                </div>
                 <Button asChild size="sm" variant="outline" className="gap-1 bg-transparent">
                   <Link href="/partner/vehicles/new">
                     <Plus className="h-4 w-4" />
@@ -305,12 +426,12 @@ export function PartnerDashboardContent() {
                   </Link>
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2">
                 {vehicles.map((vehicle) => (
                   <Link
                     key={vehicle.id}
                     href={`/partner/vehicles/${vehicle.id}/edit`}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors group"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:border-primary/30 hover:bg-muted/50 transition-all group"
                   >
                     <div className="relative h-12 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
                       {vehicle.images[0] ? (

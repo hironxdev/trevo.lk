@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge"
 import { getStaysCategories, createStaysCategory } from "@/actions/stays-category/list"
 import { Plus, Loader2, Home, Building, Castle, Star, Palmtree, Mountain, Building2, Trees } from "lucide-react"
 import { toast } from "sonner"
+import { normalizeCategories } from "@/lib/utils/normalize-categories"
 
 const categoryTypeIcons: Record<string, any> = {
   BUDGET: Building,
@@ -75,10 +76,14 @@ export function StaysCategoryManagement() {
     try {
       const result = await getStaysCategories()
       if (result.success && result.data) {
-        setCategories(result.data)
+        setCategories(normalizeCategories(result.data))
+      } else {
+        setCategories([])
       }
     } catch (error) {
+      console.error("[v0] Error fetching stays categories:", error)
       toast.error("Failed to fetch categories")
+      setCategories([])
     } finally {
       setLoading(false)
     }
@@ -223,26 +228,34 @@ export function StaysCategoryManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map((category) => {
-                const Icon = categoryTypeIcons[category.category] || Home
-                return (
-                  <TableRow key={category.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-muted-foreground" />
-                        {category.name}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={categoryTypeColors[category.category]}>
-                        {category.category.replace("_", " ")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">{category.description}</TableCell>
-                    <TableCell className="text-muted-foreground">{category.slug}</TableCell>
-                  </TableRow>
-                )
-              })}
+              {Array.isArray(categories) && categories.length > 0 ? (
+                categories.map((category) => {
+                  const Icon = categoryTypeIcons[category.category] || Home
+                  return (
+                    <TableRow key={category.id}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4 text-muted-foreground" />
+                          {category.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={categoryTypeColors[category.category]}>
+                          {category.category?.replace("_", " ") || "N/A"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate">{category.description || "-"}</TableCell>
+                      <TableCell className="text-muted-foreground">{category.slug || "-"}</TableCell>
+                    </TableRow>
+                  )
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    No categories to display
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         )}
