@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { StaysBookingsList } from "./_components/stays-bookings-list"
 
 export const metadata = {
-  title: "My Stays | Trevo",
+  title: "My Stays Bookings | Trevo",
   description: "View and manage your stays bookings",
 }
 
